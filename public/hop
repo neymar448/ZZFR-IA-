@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Téléchargez HOP, votre assistant vocal personnel spécialisé dans Fortnite.">
+    <meta name="keywords" content="HOP, assistant vocal, Fortnite, conseils de jeu, stratégie">
+    <title>HOP - Assistant Fortnite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Style du crosshair */
+        .crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: 2px solid red;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenue sur HOP</h1>
+    <p>Votre assistant vocal spécialisé dans Fortnite.</p>
+    <p>Veuillez entrer le code d'accès pour télécharger :</p>
+    <input type="password" id="codeInput" placeholder="Entrez le code">
+    <button onclick="verifierCode()">Valider</button>
+    <p id="message" style="color: red;"></p>
+    <div id="downloadSection" class="hidden">
+        <p>Code valide ! Cliquez ci-dessous pour télécharger HOP :</p>
+        <a href="HOP_Setup.exe" download><button>Télécharger pour PC</button></a>
+        <br><br>
+        <a href="HOP.apk" download><button>Télécharger pour Android</button></a>
+    </div>
+    
+    <!-- Crosshair -->
+    <div class="crosshair" id="crosshair"></div>
+    
+    <script>
+        function verifierCode() {
+            var code = document.getElementById("codeInput").value;
+            if (code === "neymaristhegoat") {
+                document.getElementById("downloadSection").classList.remove("hidden");
+                document.getElementById("message").innerText = "";
+                parler("Code valide. Vous pouvez maintenant télécharger HOP.");
+            } else {
+                document.getElementById("message").innerText = "Code incorrect. Essayez encore.";
+                parler("Code incorrect. Veuillez réessayer.");
+            }
+        }
+
+        // Service Worker pour mode hors ligne
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(function(reg) {
+                    console.log("Service Worker enregistré avec succès", reg);
+                })
+                .catch(function(err) {
+                    console.log("Erreur lors de l'enregistrement du Service Worker", err);
+                });
+        }
+
+        // Reconnaissance vocale
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = "fr-FR";
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            console.log("Reconnu:", transcript);
+            if (transcript.includes("hop")) {
+                alert("Activation de HOP ! Veuillez entrer le code pour télécharger.");
+                parler("Activation de HOP détectée. Veuillez entrer le code pour continuer.");
+            } else if (transcript.includes("lance fortnite")) {
+                parler("Lancement de Fortnite en cours.");
+                window.location.href = "fortnite://launch"; // Simule l'ouverture de Fortnite
+            } else if (transcript.includes("cherche le fichier")) {
+                const fichier = transcript.replace("cherche le fichier", "").trim();
+                parler("Recherche du fichier " + fichier);
+                window.open("file:///C:/Users/Public/" + fichier, "_blank"); // Simule l'ouverture d'un fichier
+            }
+        };
+        
+        recognition.onerror = function(event) {
+            console.error("Erreur de reconnaissance vocale:", event.error);
+        };
+        
+        recognition.start();
+
+        // Synthèse vocale
+        function parler(texte) {
+            const syntheseVocale = window.speechSynthesis;
+            const voix = new SpeechSynthesisUtterance(texte);
+            voix.lang = "fr-FR";
+            voix.rate = 1;
+            voix.pitch = 1;
+            voix.volume = 1;
+            syntheseVocale.speak(voix);
+        }
+    </script>
+</body>
+</html>
